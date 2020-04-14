@@ -64,3 +64,33 @@ struct D : B1, B2 {
 
 D d1{ 1 };  // construct with int argument
 D d2{ d1 };  // copy construct
+
+
+// 17.5.2 Move
+template<class T>
+Matrix<T>::Matrix(Matrix&& a)
+	: dim{ a.dim }, elem{ a.elem }
+{
+	a.dim = { 0, 0 };
+	a.elem = nullptr;
+}
+
+template<class T>
+Matrix<T>& Matrix<T>::operator=(Matrix&& a)
+{
+	swap(dim, a.dim);
+	swap(elem, a.elem);
+	return *this;
+}
+
+template<class T>
+Matrix<T> operator+(const Matrix<T>& a, const Matrix<T>& b)
+{
+	if (a.dim[0] != b.dim[0] || a.dim[1] != b.dim[1])
+		throw runtime_error{ "unequal Matrix sizes in +" };
+	Matrix res{ a.dim[0], a.dim[1] };
+	constexpr auto n = a.size();
+	for (int i = 0; i != n; ++i)
+		res.elem[i] = a.elem[i] + b.elem[i];
+	return res;
+}
